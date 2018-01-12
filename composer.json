@@ -1,0 +1,32 @@
+{
+  "name": "softbread/yii2-sendcloud",
+  "description": "Provides Yii2 component for SendCloud email service",
+  "type": "libaray",
+  "license": "BSD-2-Clause",
+  "authors": [
+    {
+      "name": "Victor Wang",
+      "email": "xiwang2000@gmail.com",
+      "homepage": "https://github.com/softbread"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {
+    "php": ">=5.5.0",
+    "yiisoft/yii2": "~2.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "SendCloud\\": "sendCloud/"
+    }
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/softbread/yii2-sendcloud.git"
+    }
+  ]
+}
