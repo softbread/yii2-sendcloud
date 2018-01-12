@@ -61,6 +61,16 @@ class Message extends BaseMessage
     protected $attachmentsTmdDir;
     
     /**
+     * @var string
+     */
+    protected $templateName;
+    
+    /**
+     * @var array
+     */
+    protected $templateVars = [];
+    
+    /**
      * @inheritDoc
      */
     public function __toString()
@@ -84,156 +94,9 @@ class Message extends BaseMessage
         throw new NotSupportedException();
     }
     
-    /**
-     * @inheritDoc
-     */
-    public function getFrom()
+    public function getTextBody()
     {
-        reset($this->from);
-        list($email, $name) = each($this->from);
-        
-        // make sure $this->from following the format of ['email' => 'name']
-        if (is_numeric($email) === true) {
-            return $name;
-        }
-        return $email;
-    }
-    
-    /**
-     * @inheritDoc
-     */
-    public function setFrom($from)
-    {
-        if (is_string($from) === true) {
-            $from = [$from];
-        }
-        $this->from = $from;
-        return $this;
-    }
-    
-    
-    public function getFromName()
-    {
-        reset($this->from);
-        list($email, $name) = each($this->from);
-        if (is_numeric($email) === false) {
-            return $name;
-        }
-        
-        return null;
-    }
-    
-    /**
-     * @inheritDoc
-     */
-    public function getTo()
-    {
-        return $this->normalizeEmails($this->to);
-    }
-    
-    /**
-     * @inheritDoc
-     */
-    public function setTo($to)
-    {
-        $this->to = $to;
-        return $this;
-    }
-    
-    /**
-     * @param $emailsData
-     * @return null|array
-     *
-     * This method will tranform any accepted email format into ['email' => 'name']
-     */
-    protected function normalizeEmails($emailsData)
-    {
-        $emails = null;
-        if (empty($emailsData) === false) {
-            if (is_array($emailsData) === true) {
-                foreach ($emailsData as $key => $email) {
-                    if (is_int($key) === true) {
-                        $emails[$email] = null;
-                    } else {
-                        $emails[$key] = $email;
-                    }
-                }
-            } elseif (is_string($emailsData) === true) {
-                $emails[$emailsData] = null;
-            }
-        }
-        return $emails;
-    }
-    
-    /**
-     * @inheritDoc
-     */
-    public function getReplyTo()
-    {
-        return $this->replyTo;
-    }
-    
-    /**
-     * @inheritDoc
-     */
-    public function setReplyTo($replyTo)
-    {
-        if (is_string($replyTo) === true) {
-            $replyTo = [$replyTo];
-        }
-        $this->replyTo = $replyTo;
-        return $this;
-    }
-    
-    /**
-     * @inheritDoc
-     */
-    public function getCc()
-    {
-        return $this->normalizeEmails($this->cc);
-    }
-    
-    /**
-     * @inheritDoc
-     */
-    public function setCc($cc)
-    {
-        $this->cc = $cc;
-        return $this;
-    }
-    
-    /**
-     * @inheritDoc
-     */
-    public function getBcc()
-    {
-        return $this->normalizeEmails($this->bcc);
-    }
-    
-    /**
-     * @inheritDoc
-     */
-    public function setBcc($bcc)
-    {
-        $this->bcc = $bcc;
-        return $this;
-    }
-    
-    /**
-     * @inheritDoc
-     */
-    public function getSubject()
-    {
-        return $this->subject;
-    }
-    
-    /**
-     * @inheritDoc
-     */
-    public function setSubject($subject)
-    {
-        $this->subject = $subject;
-        return $this;
+        return $this->getTextBody();
     }
     
     /**
@@ -243,6 +106,11 @@ class Message extends BaseMessage
     {
         $this->textBody = $text;
         return $this;
+    }
+    
+    public function getHtmlBody()
+    {
+        return $this->getHtmlBody();
     }
     
     /**
@@ -346,7 +214,211 @@ class Message extends BaseMessage
      */
     public function toString()
     {
-        // TODO: Implement toString() method.
+        return json_encode(array_filter([
+                                            'from'        => $this->getFrom(),
+                                            'subject'     => $this->getSubject(),
+                                            'html_body'   => $this->htmlBody,
+                                            'text_body'   => $this->textBody,
+                                            'attachments' => $this->getAttachments(),
+                                            'reply_to'    => $this->getReplyTo(),
+                                            'tos'         => $this->getTo(),
+                                            'ccs'         => $this->getCc(),
+                                            'bccs'        => $this->getBcc(),
+                                            'fromname'    => $this->getFromName(),
+                                        ])
+        );
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function getFrom()
+    {
+        reset($this->from);
+        list($email, $name) = each($this->from);
+        
+        // make sure $this->from following the format of ['email' => 'name']
+        if (is_numeric($email) === true) {
+            return $name;
+        }
+        return $email;
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function setFrom($from)
+    {
+        if (is_string($from) === true) {
+            $from = [$from];
+        }
+        $this->from = $from;
+        return $this;
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function getSubject()
+    {
+        return $this->subject;
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function setSubject($subject)
+    {
+        $this->subject = $subject;
+        return $this;
+    }
+    
+    public function getAttachments()
+    {
+        return empty($this->attachments) ? [] : $this->attachments;
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function getReplyTo()
+    {
+        return $this->replyTo;
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function setReplyTo($replyTo)
+    {
+        if (is_string($replyTo) === true) {
+            $replyTo = [$replyTo];
+        }
+        $this->replyTo = $replyTo;
+        return $this;
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function getTo()
+    {
+        return $this->normalizeEmails($this->to);
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function setTo($to)
+    {
+        $this->to = $to;
+        return $this;
+    }
+    
+    /**
+     * @param $emailsData
+     * @return null|array
+     *
+     * This method will tranform any accepted email format into ['email' => 'name']
+     */
+    protected function normalizeEmails($emailsData)
+    {
+        $emails = null;
+        if (empty($emailsData) === false) {
+            if (is_array($emailsData) === true) {
+                foreach ($emailsData as $key => $email) {
+                    if (is_int($key) === true) {
+                        $emails[$email] = null;
+                    } else {
+                        $emails[$key] = $email;
+                    }
+                }
+            } elseif (is_string($emailsData) === true) {
+                $emails[$emailsData] = null;
+            }
+        }
+        return $emails;
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function getCc()
+    {
+        return $this->normalizeEmails($this->cc);
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function setCc($cc)
+    {
+        $this->cc = $cc;
+        return $this;
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function getBcc()
+    {
+        return $this->normalizeEmails($this->bcc);
+    }
+    
+    /**
+     * @inheritDoc
+     */
+    public function setBcc($bcc)
+    {
+        $this->bcc = $bcc;
+        return $this;
+    }
+    
+    public function getFromName()
+    {
+        reset($this->from);
+        list($email, $name) = each($this->from);
+        if (is_numeric($email) === false) {
+            return $name;
+        }
+        
+        return null;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getTemplateName()
+    {
+        return $this->templateName;
+    }
+    
+    /**
+     * @param $templateName
+     * @return $this
+     */
+    public function setTemplateName($templateName)
+    {
+        $this->templateName = $templateName;
+        return $this;
+    }
+    
+    /**
+     * @return array
+     */
+    public function getTemplateVars()
+    {
+        return $this->templateVars;
+    }
+    
+    /**
+     * @param array $vars
+     * @return $this
+     */
+    public function setTemplateVars(array $vars)
+    {
+        $this->templateVars = $vars;
+        return $this;
     }
     
     /**

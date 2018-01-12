@@ -32,26 +32,37 @@ class SendCloudClient
     
     /**
      * @param Mail $mail
-     * @return string
+     * @return \yii\httpclient\Response
      */
-    public function sendCommon(Mail $mail)
+    public function send(Mail $mail)
     {
-        $url = self::HOST_V2 . self::SEND_URL_V2;
+        if ($mail->getTemplateContent()) {
+            return $this->sendTemplate($mail);
+        }
         
-        if ($this->version == '1') {
-            $url = self::HOST_V1 . self::SEND_URL_V1;
+        return $this->sendCommon($mail);
+    }
+    
+    /**
+     * @param Mail $mail
+     * @return \yii\httpclient\Response
+     */
+    public function sendTemplate(Mail $mail)
+    {
+        $url = self::HOST_V2 . self::SEND_TEMPLATE_URL_V2;
+        
+        if ($this->version == 'v1') {
+            $url = self::HOST_V1 . self::SEND_TEMPLATE_URL_V1;
         }
         
         if ($mail->hasAttachment()) {
             $bodyData = $this->wrapBody($mail);
-            
-            $response = $this->client->mutilpost($url, $bodyData['body'], $bodyData['header']);
+            $response = $this->client->mutilpost($url, $bodyData ['body'],
+                                                 $bodyData ['header']);
         } else {
             $param = $this->wrapParam($mail);
-            
             $response = $this->client->post($url, [], $param);
         }
-        
         return $response;
     }
     
@@ -439,37 +450,26 @@ class SendCloudClient
     
     /**
      * @param Mail $mail
-     * @return string
+     * @return \yii\httpclient\Response
      */
-    public function sendTemplate(Mail $mail)
+    public function sendCommon(Mail $mail)
     {
-        $url = self::HOST_V2 . self::SEND_TEMPLATE_URL_V2;
+        $url = self::HOST_V2 . self::SEND_URL_V2;
         
-        if ($this->version == 'v1') {
-            $url = self::HOST_V1 . self::SEND_TEMPLATE_URL_V1;
+        if ($this->version == '1') {
+            $url = self::HOST_V1 . self::SEND_URL_V1;
         }
         
         if ($mail->hasAttachment()) {
             $bodyData = $this->wrapBody($mail);
-            $response = $this->client->mutilpost($url, $bodyData ['body'],
-                                                 $bodyData ['header']);
+            
+            $response = $this->client->mutilpost($url, $bodyData['body'], $bodyData['header']);
         } else {
             $param = $this->wrapParam($mail);
+            
             $response = $this->client->post($url, [], $param);
         }
-        return $response;
-    }
-    
-    /**
-     * @param Mail $mail
-     * @return string
-     */
-    public function send(Mail $mail)
-    {
-        if ($mail->getTemplateContent()) {
-            return $this->sendTemplate($mail);
-        }
         
-        return $this->sendCommon($mail);
+        return $response;
     }
 }

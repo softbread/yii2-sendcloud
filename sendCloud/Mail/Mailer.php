@@ -14,7 +14,10 @@
 
 namespace SendCloud\Mail;
 
+use SendCloud\Util\Attachment;
 use SendCloud\Util\Mail as SendCloudMail;
+use SendCloud\Util\Mimetypes;
+use SendCloud\Util\TemplateContent;
 use yii\base\InvalidConfigException;
 use yii\base\InvalidParamException;
 use yii\mail\BaseMailer;
@@ -23,12 +26,12 @@ class Mailer extends BaseMailer
 {
     
     /**
-     * @var string Sendgrid login
+     * @var string Sendcloud login
      */
     public $api_user;
     
     /**
-     * @var string Sendgrid password
+     * @var string Sendcloud password
      */
     public $api_key;
     
@@ -63,7 +66,7 @@ class Mailer extends BaseMailer
                 $sendCloudMail->setReplyTo($replyTo);
             }
             $sendCloudMail->setFrom($message->getFrom());
-            if ($message->getFromName() !== null) {
+            if ($message->getFromName()) {
                 $sendCloudMail->setFromName($message->getFromName());
             }
             foreach ($message->getTo() as $email => $name) {
@@ -76,40 +79,44 @@ class Mailer extends BaseMailer
                 $sendCloudMail->addBcc($email);
             }
             $sendCloudMail->setSubject($message->getSubject());
-            foreach ($message->getHeaders() as $header) {
-                list($key, $value) = each($header);
-                $sendCloudMail->addHeader($key, $value);
-            }
+            
             foreach ($message->getAttachments() as $attachment) {
-                $cid = isset($attachment['ContentID']) ? $attachment['ContentID'] : null;
+                $file = $attachment['File'];
+                $handle = fopen($file, 'rb');
+                $content = fread($handle, filesize($file));
+                $filetype = Mimetypes::getInstance()
+                                     ->fromFilename($file);
                 
+                $attachment = new Attachment();
                 
-                $sendCloudMail->addAttachment($attachment['File'], $attachment['Name'], $cid);
+                $attachment->setType($filetype);
+                $attachment->setContent($content);
+                $attachment->setFilename($attachment['Name']);
+                
+                $sendCloudMail->addAttachment($attachment);
+                fclose($handle);
             }
             
-            $templateId = $message->getTemplateId();
-            if ($templateId === null) {
+            $templateName = $message->getTemplateName();
+            if ($templateName === null) {
                 $data = $message->getHtmlBody();
                 if ($data !== null) {
-                    $sendCloudMail->setHtml($data);
+                    $sendCloudMail->setContent($data);
                 }
                 $data = $message->getTextBody();
                 if ($data !== null) {
-                    $sendCloudMail->setText($data);
+                    $sendCloudMail->setPlain($data);
                 }
             } else {
-                $sendCloudMail->setTemplateId($templateId);
-                // trigger html template
-                $sendCloudMail->setHtml(' ');
-                // trigger text template
-                $sendCloudMail->setText(' ');
-                $templateModel = $message->getTemplateModel();
-                if (empty($templateModel) === false) {
-                    $sendCloudMail->setSubstitutions($message->getTemplateModel());
+                $templateContent = new TemplateContent();
+                $templateContent->setTemplateInvokeName($templateName);
+                $templateVars = $message->getTemplateVars();
+                foreach ($templateVars as $key => $var) {
+                    $templateContent->addVars($key, $var);
                 }
+                $sendCloudMail->setTemplateContent($templateContent);
             }
             $result = $client->send($sendCloudMail);
-            /* @var \yii\httpclient\Response $result */
             return $result->getStatusCode() == 200;
         } catch (\Exception $e) {
             throw $e;
