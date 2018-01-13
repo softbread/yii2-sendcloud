@@ -47,3 +47,17 @@ Yii::$app->mailer->compose('contact/html')
 
 For further instructions refer to the [related section in the Yii Definitive Guide](http://www.yiiframework.com/doc-2.0/guide-tutorial-mailing.html)
 
+Also you can use SendCloud template Emails
+
+``` php
+Yii::$app->mailer->compose('contact/html')
+     ->setFrom('from@domain.com')
+     ->setTo([email1, email2])
+     ->setSubject($form->subject)
+     ->setTemplateName('revoke-name')
+     ->setTemplateVars([
+            '%name%' => ['X1', 'X2'],
+            '%money% => [12.5, 1.9]
+        ])
+     ->send();
+```

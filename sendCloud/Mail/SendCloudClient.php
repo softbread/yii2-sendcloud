@@ -212,15 +212,15 @@ class SendCloudClient
             $data .= $this->appendFormParam('from', $mail->getFrom(), $mime_boundary);
         }
         if ($mail->getTos()) {
-            $data .= $this->appendFormParam('to', implode(',', $mail->getTos()), $mime_boundary);
+            $data .= $this->appendFormParam('to', implode(';', $mail->getTos()), $mime_boundary);
         }
         
         if ($mail->getBccs()) {
-            $data .= $this->appendFormParam('bcc', implode(',', $mail->getBccs()), $mime_boundary);
+            $data .= $this->appendFormParam('bcc', implode(';', $mail->getBccs()), $mime_boundary);
         }
         
         if ($mail->getCcs()) {
-            $data .= $this->appendFormParam('bcc', implode(',', $mail->getCcs()), $mime_boundary);
+            $data .= $this->appendFormParam('bcc', implode(';', $mail->getCcs()), $mime_boundary);
         }
         
         if ($mail->getXsmtpApi()) {
@@ -394,15 +394,15 @@ class SendCloudClient
             $param ['from'] = $mail->getFrom();
         }
         if ($mail->getTos()) {
-            $param ['to'] = implode(',', $mail->getTos());
+            $param ['to'] = implode(';', $mail->getTos());
         }
         
         if ($mail->getBccs()) {
-            $param ['bcc'] = implode(',', $mail->getBccs());
+            $param ['bcc'] = implode(';', $mail->getBccs());
         }
         
         if ($mail->getCcs()) {
-            $param ['cc'] = implode(',', $mail->getCcs());
+            $param ['cc'] = implode(';', $mail->getCcs());
         }
         if ($mail->getXsmtpApi()) {
             $param ['xsmtpapi'] = $mail->getXsmtpApi();
