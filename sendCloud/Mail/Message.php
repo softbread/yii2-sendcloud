@@ -428,6 +428,7 @@ class Message extends BaseMessage
     {
         $result = parent::send($mailer);
         
+        //TODO: clean up tmpdir after ourselves
         return $result;
     }
 }

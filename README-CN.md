@@ -1,14 +1,16 @@
-SendCloud Yii2 integration
+SendCloud服务的Yii2组件
 =========================
-［中文文档］(https://README-CHN.md)
+[English Guide](README.md)
 
-This extension allow the developper to use [SendCloud](https://sendcloud.net/) as an email transport.
-This work is inspired by [yii2-sendgrid](https://github.com/pgaultier/yii2-sendgrid).
+这是一个Yii2框架的组件，该组件可以替代Yii2的SwiftMailer实现发送邮件。
+利用[SendCloud](https://sendcloud.net/)的API，用户可以在SMTP端口被封的情况下发送邮件，
+也可以利用SendCloud的模版和联系人列表实现更更复杂的邮件推送功能。
+这个组件是看到[yii2-sendgrid](https://github.com/pgaultier/yii2-sendgrid)而收到的启发。
 
-Installation
+安装
 ------------
 
-If you use Composer, you can update your composer.json like this :
+添加 ``yii-sendcloud`` 到你的composer配置文件 composer.json :
 
 ``` json
 {
@@ -18,10 +20,10 @@ If you use Composer, you can update your composer.json like this :
 }
 ```
 
-How to use it
+如何使用
 ------------
 
-Add extension to your configuration
+先把这个组件添加到web.conf的mailer:
 
 ``` php
 return [
@@ -36,7 +38,7 @@ return [
 ];
 ```
 
-You can send email via SendCloud as mailer component 
+你就可以用Yii2的发邮件功能了实现真正的邮件功能了：
 
 ``` php
 Yii::$app->mailer->compose('contact/html')
@@ -46,9 +48,9 @@ Yii::$app->mailer->compose('contact/html')
      ->send();
 ```
 
-For further instructions refer to the [related section in the Yii Definitive Guide](http://www.yiiframework.com/doc-2.0/guide-tutorial-mailing.html)
+Yii2 Mailer更详细的用法参见：[Yii2文档发送邮件部分](http://www.yiiframework.com/doc-2.0/guide-tutorial-mailing.html)
 
-Also you can use SendCloud template Emails
+当然，这个扩展也支持SendCloud的模版生成的邮件：
 
 ``` php
 Yii::$app->mailer->compose('contact/html')

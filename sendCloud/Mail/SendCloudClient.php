@@ -223,9 +223,6 @@ class SendCloudClient
             $data .= $this->appendFormParam('bcc', implode(';', $mail->getCcs()), $mime_boundary);
         }
         
-        if ($mail->getXsmtpApi()) {
-            $data .= $this->appendFormParam('xsmtpapi', $mail->getXsmtpApi(), $mime_boundary);
-        }
         if ($mail->getContent()) {
             $data .= $this->appendFormParam('html', $mail->getContent(), $mime_boundary);
         }
@@ -269,6 +266,15 @@ class SendCloudClient
             $invokeName = $template->getTemplateInvokeName();
             if ($invokeName) {
                 $data .= $this->appendFormParam('templateInvokeName', $invokeName, $mime_boundary);
+                
+                $templateVars = $template->getTemplateVars();
+                if ($templateVars) {
+                    $xsmtpApi = [
+                        'to'  => $mail->getTos(),
+                        'sub' => $templateVars,
+                    ];
+                    $data .= $this->appendFormParam('xsmtpapi', json_encode($xsmtpApi), $mime_boundary);
+                }
             }
         }
         
@@ -404,9 +410,6 @@ class SendCloudClient
         if ($mail->getCcs()) {
             $param ['cc'] = implode(';', $mail->getCcs());
         }
-        if ($mail->getXsmtpApi()) {
-            $param ['xsmtpapi'] = $mail->getXsmtpApi();
-        }
         if ($mail->getContent()) {
             $param ['html'] = $mail->getContent();
         }
@@ -442,6 +445,15 @@ class SendCloudClient
             $invokeName = $template->getTemplateInvokeName();
             if ($invokeName) {
                 $param ['templateInvokeName'] = $invokeName;
+                
+                $templateVars = $template->getTemplateVars();
+                if ($templateVars) {
+                    $xsmtpApi = [
+                        'to'  => $mail->getTos(),
+                        'sub' => $templateVars,
+                    ];
+                    $param['xsmtpapi'] = json_encode($xsmtpApi);
+                }
             }
         }
         

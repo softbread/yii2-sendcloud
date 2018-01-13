@@ -56,14 +56,14 @@ class Mail implements \JsonSerializable
         $this->setFrom($from);
         $this->setSubject($subject);
         $this->setContent($content);
-        $this->addTo($to);
     }
     
+    /**
+     * @param $email string single email address
+     */
     public function addTo($email)
     {
-        if (!in_array($email, $this->tos)) {
-            $this->tos[] = $email;
-        }
+        $this->tos[] = $email;
     }
     
     public function addAttachment($attachment)
