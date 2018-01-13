@@ -49,8 +49,8 @@ class Mail implements \JsonSerializable
     
     public function __construct($from = null, $subject = null, $to = null, $content = null)
     {
-        if (empty ($from) || empty ($subject) || empty ($to) || empty ($content)) {
-            throw new InvalidConfigException('Missing email parameters (From / To / Subject / Content required)');
+        if (empty ($from) || empty ($subject) || empty ($to)) {
+            throw new InvalidConfigException('Missing email parameters (From / To / Subject required)');
         }
         
         $this->setFrom($from);

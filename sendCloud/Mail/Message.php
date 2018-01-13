@@ -83,7 +83,7 @@ class Message extends BaseMessage
      */
     public function getCharset()
     {
-        throw new NotSupportedException();
+        return ['UTF-8'];
     }
     
     /**
@@ -96,7 +96,7 @@ class Message extends BaseMessage
     
     public function getTextBody()
     {
-        return $this->getTextBody();
+        return $this->textBody;
     }
     
     /**
@@ -110,7 +110,7 @@ class Message extends BaseMessage
     
     public function getHtmlBody()
     {
-        return $this->getHtmlBody();
+        return $this->htmlBody;
     }
     
     /**

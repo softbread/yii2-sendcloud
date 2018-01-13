@@ -59,7 +59,7 @@ class Mailer extends BaseMailer
                 throw new InvalidParamException('Email transport must be configured');
             }
             
-            $sendCloudMail = new SendCloudMail();
+            $sendCloudMail = new SendCloudMail($message->getFrom(), $message->getTo(), $message->getSubject());
             
             $replyTo = $message->getReplyTo();
             if ($replyTo !== null) {
@@ -69,37 +69,46 @@ class Mailer extends BaseMailer
             if ($message->getFromName()) {
                 $sendCloudMail->setFromName($message->getFromName());
             }
+            
             foreach ($message->getTo() as $email => $name) {
                 $sendCloudMail->addTo($email);
             }
-            foreach ($message->getCc() as $email => $name) {
-                $sendCloudMail->addCc($email);
+            if ($message->getCc()) {
+                foreach ($message->getCc() as $email => $name) {
+                    $sendCloudMail->addCc($email);
+                }
             }
-            foreach ($message->getBcc() as $email => $name) {
-                $sendCloudMail->addBcc($email);
+            if ($message->getBcc()) {
+                foreach ($message->getBcc() as $email => $name) {
+                    $sendCloudMail->addBcc($email);
+                }
             }
-            $sendCloudMail->setSubject($message->getSubject());
             
-            foreach ($message->getAttachments() as $attachment) {
-                $file = $attachment['File'];
-                $handle = fopen($file, 'rb');
-                $content = fread($handle, filesize($file));
-                $filetype = Mimetypes::getInstance()
-                                     ->fromFilename($file);
-                
-                $attachment = new Attachment();
-                
-                $attachment->setType($filetype);
-                $attachment->setContent($content);
-                $attachment->setFilename($attachment['Name']);
-                
-                $sendCloudMail->addAttachment($attachment);
-                fclose($handle);
+            $mailAttachments = $message->getAttachments();
+            if ($mailAttachments) {
+                foreach ($mailAttachments as $mailAttachment) {
+                    $file = $mailAttachment['File'];
+                    $handle = fopen($file, 'rb');
+                    $content = fread($handle, filesize($file));
+                    $filetype = Mimetypes::getInstance()
+                                         ->fromFilename($file);
+                    
+                    $attachment = new Attachment();
+                    
+                    $attachment->setType($filetype);
+                    $attachment->setContent($content);
+                    $attachment->setFilename($mailAttachments['Name']);
+                    
+                    $sendCloudMail->addAttachment($attachment);
+                    fclose($handle);
+                }
             }
             
             $templateName = $message->getTemplateName();
-            if ($templateName === null) {
+            
+            if (is_null($templateName)) {
                 $data = $message->getHtmlBody();
+                
                 if ($data !== null) {
                     $sendCloudMail->setContent($data);
                 }
@@ -116,10 +125,17 @@ class Mailer extends BaseMailer
                 }
                 $sendCloudMail->setTemplateContent($templateContent);
             }
+            
             $result = $client->send($sendCloudMail);
-            return $result->getStatusCode() == 200;
+            
+            if ($result->getStatusCode() == 200) {
+                $content = json_decode($result->getContent());
+                return $content->result;
+            }
         } catch (\Exception $e) {
-            throw $e;
+            echo $e->getMessage();
         }
+        
+        return false;
     }
 }

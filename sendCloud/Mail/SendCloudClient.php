@@ -2,7 +2,6 @@
 
 namespace SendCloud\Mail;
 
-use SendCloud\Util\HttpClient;
 use SendCloud\Util\Mail;
 
 class SendCloudClient
@@ -21,13 +20,13 @@ class SendCloudClient
     private $api_key;
     private $version;
     
-    public function __construct($api_user, $api_key, $version = "v1")
+    public function __construct($api_user, $api_key, $version = "v2")
     {
         $host = $version === 'v1' ? self::HOST_V1 : self::HOST_V2;
         $this->api_user = $api_user;
         $this->api_key = $api_key;
         $this->version = $version;
-        $this->client = new HttpClient($host);
+        $this->client = new \SendCloud\Util\HttpClient($host);
     }
     
     /**
@@ -213,15 +212,15 @@ class SendCloudClient
             $data .= $this->appendFormParam('from', $mail->getFrom(), $mime_boundary);
         }
         if ($mail->getTos()) {
-            $data .= $this->appendFormParam('to', implode(";", $mail->getTos()), $mime_boundary);
+            $data .= $this->appendFormParam('to', implode(',', $mail->getTos()), $mime_boundary);
         }
         
         if ($mail->getBccs()) {
-            $data .= $this->appendFormParam('bcc', implode(";", $mail->getBccs()), $mime_boundary);
+            $data .= $this->appendFormParam('bcc', implode(',', $mail->getBccs()), $mime_boundary);
         }
         
         if ($mail->getCcs()) {
-            $data .= $this->appendFormParam('bcc', implode(";", $mail->getCcs()), $mime_boundary);
+            $data .= $this->appendFormParam('bcc', implode(',', $mail->getCcs()), $mime_boundary);
         }
         
         if ($mail->getXsmtpApi()) {
@@ -262,7 +261,7 @@ class SendCloudClient
         }
         
         if ($mail->getUseNotification()) {
-            $data .= $this->appendFormParam('useNotification', $headers, $mime_boundary);
+            $data .= $this->appendFormParam('useNotification', $header, $mime_boundary);
         }
         
         if ($mail->getTemplateContent()) {
@@ -273,8 +272,9 @@ class SendCloudClient
             }
         }
         
-        if ($mail->getAttachments()) {
-            foreach ($mail->getAttachments() as $attach) {
+        $attaches = $mail->getAttachments();
+        if (!empty($attaches)) {
+            foreach ($attaches as $attach) {
                 $content = $attach->getContent();
                 $filename = $attach->getFilename();
                 $filetype = $attach->getType();
@@ -394,15 +394,15 @@ class SendCloudClient
             $param ['from'] = $mail->getFrom();
         }
         if ($mail->getTos()) {
-            $param ['to'] = implode(";", $mail->getTos());
+            $param ['to'] = implode(',', $mail->getTos());
         }
         
         if ($mail->getBccs()) {
-            $param ['bcc'] = implode(";", $mail->getBccs());
+            $param ['bcc'] = implode(',', $mail->getBccs());
         }
         
         if ($mail->getCcs()) {
-            $param ['cc'] = implode(";", $mail->getCcs());
+            $param ['cc'] = implode(',', $mail->getCcs());
         }
         if ($mail->getXsmtpApi()) {
             $param ['xsmtpapi'] = $mail->getXsmtpApi();
@@ -443,8 +443,8 @@ class SendCloudClient
             if ($invokeName) {
                 $param ['templateInvokeName'] = $invokeName;
             }
-            
         }
+        
         return $param;
     }
     
@@ -456,7 +456,7 @@ class SendCloudClient
     {
         $url = self::HOST_V2 . self::SEND_URL_V2;
         
-        if ($this->version == '1') {
+        if ($this->version == 'v1') {
             $url = self::HOST_V1 . self::SEND_URL_V1;
         }
         

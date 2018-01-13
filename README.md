@@ -28,8 +28,8 @@ return [
     'components' => [
         'mailer' => [
             'class' => 'SendCloud\Mail\Mailer',
-            'user' => '<your sendcloud api-user>',
-            'key'  => '<your sendcloud api-key>'
+            'api_user' => '<your sendcloud api-user>',
+            'api_key'  => '<your sendcloud api-key>'
         ],
     ],
 ];
