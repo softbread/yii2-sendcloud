@@ -1,6 +1,6 @@
 SendCloud Yii2 integration
 =========================
-［中文文档］(https://README-CHN.md)
+[中文文档](README-CHN.md)
 
 This extension allow the developper to use [SendCloud](https://sendcloud.net/) as an email transport.
 This work is inspired by [yii2-sendgrid](https://github.com/pgaultier/yii2-sendgrid).

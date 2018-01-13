@@ -24,7 +24,6 @@ use yii\mail\BaseMailer;
 
 class Mailer extends BaseMailer
 {
-    
     /**
      * @var string Sendcloud login
      */
