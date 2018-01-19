@@ -32,6 +32,11 @@ return [
             'api_user' => '<your sendcloud api-user>',
             'api_key'  => '<your sendcloud api-key>'
         ],
+        'sendSms' => [
+            'class'  => 'SendCloud\Sms\SendSms',
+            'apiUser => '<your SMS api-user>',
+            'apiKey  => '<your SMS api-key>'
+        ],
     ],
 ];
 ```
@@ -62,3 +67,13 @@ Yii::$app->mailer->compose('contact/html')
         ])
      ->send();
 ```
+
+To send SMS message:
+``` php
+Yii::$app->sendSms->setTo(['13700000000', '13011111111'])
+    ->setTemplate('1001')
+    ->setVars(['code' => '000111'])
+    ->send();
+```
+
+For further instruction refer to the [SendCloud SMS API doc](http://www.sendcloud.net/doc/sms/api/)

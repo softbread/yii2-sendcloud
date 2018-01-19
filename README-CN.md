@@ -34,6 +34,11 @@ return [
             'api_user' => '<your sendcloud api-user>',
             'api_key'  => '<your sendcloud api-key>'
         ],
+        'sendSms' => [
+            'class'  => 'SendCloud\Sms\SendSms',
+            'apiUser => '<your SMS api-user>',
+            'apiKey  => '<your SMS api-key>'
+        ],
     ],
 ];
 ```
@@ -64,3 +69,13 @@ Yii::$app->mailer->compose('contact/html')
         ])
      ->send();
 ```
+
+利用这个扩展发送短信也非常简单，但需要你的SendCloud帐户余额不为0：
+``` php
+Yii::$app->sendSms->setTo(['13700000000', '13011111111'])
+    ->setTemplate('1001')
+    ->setVars(['code' => '000111'])
+    ->send();
+```
+
+SMS的发送规则及限制参见：[SendCloud SMS API 文档](http://www.sendcloud.net/doc/sms/api/)
