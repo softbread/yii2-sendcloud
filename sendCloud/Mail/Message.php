@@ -146,7 +146,7 @@ class Message extends BaseMessage
     {
         if ($this->attachmentsTmdDir === null) {
             $uid = uniqid();
-            $this->attachmentsTmdDir = Yii::getAlias('@app/runtime/' . $uid . '/');
+            $this->attachmentsTmdDir = Yii::getAlias('@app/runtime/' . $uid);
             $status = true;
             if (file_exists($this->attachmentsTmdDir) === false) {
                 $status = mkdir($this->attachmentsTmdDir, 0755, true);
@@ -183,7 +183,7 @@ class Message extends BaseMessage
         if (isset($options['fileName']) === false || empty($options['fileName'])) {
             throw new InvalidParamException('fileName is missing');
         }
-        $filePath = $this->getTempDir() . '/' . $options['fileName'];
+        $filePath = $this->getTempDir() . '/'. $options['fileName'];
         if (file_put_contents($filePath, $content) === false) {
             throw new InvalidConfigException('Cannot write file \'' . $filePath . '\'');
         }
@@ -431,4 +431,5 @@ class Message extends BaseMessage
         //TODO: clean up tmpdir after ourselves
         return $result;
     }
+    
 }

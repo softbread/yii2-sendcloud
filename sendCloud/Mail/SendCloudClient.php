@@ -205,6 +205,7 @@ class SendCloudClient
         $mime_boundary = md5(time());
         $data .= $this->appendFormParam('apiUser', $this->api_user, $mime_boundary);
         $data .= $this->appendFormParam('apiKey', $this->api_key, $mime_boundary);
+        
         if ($mail->getSubject()) {
             $data .= $this->appendFormParam('subject', $mail->getSubject(), $mime_boundary);
         }
@@ -403,10 +404,11 @@ class SendCloudClient
             $param ['to'] = implode(';', $mail->getTos());
         }
         
+        // Send Template Email doesn't support BCC
         if ($mail->getBccs()) {
             $param ['bcc'] = implode(';', $mail->getBccs());
         }
-        
+        // Send Template Email doesn't support CC
         if ($mail->getCcs()) {
             $param ['cc'] = implode(';', $mail->getCcs());
         }
@@ -453,6 +455,9 @@ class SendCloudClient
                         'sub' => $templateVars,
                     ];
                     $param['xsmtpapi'] = json_encode($xsmtpApi);
+                    
+                    // x-smtp-api will overwrite $param['to'];
+                    unset($param['to']);
                 }
             }
         }

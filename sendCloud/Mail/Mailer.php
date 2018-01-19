@@ -24,6 +24,7 @@ use yii\mail\BaseMailer;
 
 class Mailer extends BaseMailer
 {
+    
     /**
      * @var string Sendcloud login
      */
@@ -96,7 +97,12 @@ class Mailer extends BaseMailer
                     
                     $attachment->setType($filetype);
                     $attachment->setContent($content);
-                    $attachment->setFilename($mailAttachments['Name']);
+                    
+                    if (!empty($mailAttachments['Name'])) {
+                        $attachment->setFilename($mailAttachments['Name']);
+                    } else {
+                        $attachment->setFilename(basename($file));
+                    }
                     
                     $sendCloudMail->addAttachment($attachment);
                     fclose($handle);
@@ -106,14 +112,13 @@ class Mailer extends BaseMailer
             $templateName = $message->getTemplateName();
             
             if (is_null($templateName)) {
-                $data = $message->getHtmlBody();
-                
-                if ($data !== null) {
-                    $sendCloudMail->setContent($data);
-                }
                 $data = $message->getTextBody();
                 if ($data !== null) {
                     $sendCloudMail->setPlain($data);
+                }
+                $data = $message->getHtmlBody();
+                if ($data !== null) {
+                    $sendCloudMail->setContent($data);
                 }
             } else {
                 $templateContent = new TemplateContent();

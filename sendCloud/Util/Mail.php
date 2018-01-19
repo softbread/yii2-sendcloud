@@ -47,7 +47,7 @@ class Mail implements \JsonSerializable
     private $plain;
     private $use_notification;
     
-    public function __construct($from = null, $subject = null, $to = null, $content = null)
+    public function __construct($from = null, $to = null, $subject=null, $content = null)
     {
         if (empty ($from) || empty ($subject) || empty ($to)) {
             throw new InvalidConfigException('Missing email parameters (From / To / Subject required)');
@@ -99,7 +99,10 @@ class Mail implements \JsonSerializable
         return $this->template_content;
     }
     
-    public function setTemplateContent($template_content)
+    /**
+     * @param TemplateContent $template_content
+     */
+    public function setTemplateContent(TemplateContent $template_content)
     {
         $this->template_content = $template_content;
     }
