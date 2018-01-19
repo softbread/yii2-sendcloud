@@ -5,6 +5,7 @@ SendCloud服务的Yii2组件
 这是一个Yii2框架的组件，该组件可以替代Yii2的SwiftMailer实现发送邮件。
 利用[SendCloud](https://sendcloud.net/)的API，用户可以在SMTP端口被封的情况下发送邮件，
 也可以利用SendCloud的模版和联系人列表实现更更复杂的邮件推送功能。
+另外，这个组件也重构了SendCloud的短信发送的SDK，触发短信更为简洁。
 这个组件是看到[yii2-sendgrid](https://github.com/pgaultier/yii2-sendgrid)而得到的启发。
 
 安装

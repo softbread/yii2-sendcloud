@@ -3,6 +3,7 @@ SendCloud Yii2 integration
 [中文文档](README-CN.md)
 
 This extension allows developpers to use [SendCloud](https://sendcloud.net/) as an email transport.
+Also, you may use this extension to send SMS messages to Chinese cell phones via SendCloud.
 This work is inspired by [yii2-sendgrid](https://github.com/pgaultier/yii2-sendgrid).
 
 Installation
