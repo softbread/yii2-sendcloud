@@ -18,6 +18,7 @@ use SendCloud\Util\Attachment;
 use SendCloud\Util\Mail as SendCloudMail;
 use SendCloud\Util\Mimetypes;
 use SendCloud\Util\TemplateContent;
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\InvalidParamException;
 use yii\mail\BaseMailer;
@@ -85,7 +86,7 @@ class Mailer extends BaseMailer
             }
             
             $mailAttachments = $message->getAttachments();
-            if ($mailAttachments) {
+            if (!empty($mailAttachments)) {
                 foreach ($mailAttachments as $mailAttachment) {
                     $file = $mailAttachment['File'];
                     $handle = fopen($file, 'rb');
@@ -137,7 +138,7 @@ class Mailer extends BaseMailer
                 return $content->result;
             }
         } catch (\Exception $e) {
-            echo $e->getMessage();
+            Yii::$app->log->dispatch($e->getTrace(), true);
         }
         
         return false;
